@@ -19,4 +19,9 @@ public class MemberDao {
 		String sql = "select * from `member` where loginid = ? and loginpass = ?";
 		return db.getRow(sql, new MemberRowMapper(), login_id, login_pass);
 	}
+
+	public Object CheckloginID(String login_id) {
+		String sql = "select * from `member` where loginid = ?";
+		return db.getRow(sql, new MemberRowMapper(), login_id);
+	}
 }

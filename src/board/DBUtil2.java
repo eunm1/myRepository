@@ -6,23 +6,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import board.article.ArticleRowMapper;
+
 
 public class DBUtil2 {
 	
-	// ======================== DB ? ‘?† ? •ë³? ?„¸?Œ… =========================
-	// ?“œ?¼?´ë²? ? •ë³?
+	// ======================== DB ì ‘ì† ì •ë³´ ì„¸íŒ… =========================
+	// ë“œë¼ì´ë²„ ì •ë³´
 	String driver = "com.mysql.cj.jdbc.Driver";
-	// dbms ì£¼ì†Œp
+	// dbms ì£¼ì†Œ
 	String url = "jdbc:mysql://localhost:3306/t1?serverTimezone=UTC";
-	// ?‚¬?š©? ê³„ì •
-	String user = "sbsst";
-	// ?‚¬?š©? ë¹„ë?ë²ˆí˜¸
-	String pass = "sbs123414";
+	// ì‚¬ìš©ì ê³„ì •
+	String user = "root";
+	// ì‚¬ìš©ì ë¹„ë°€ë²ˆí˜¸
+	String pass = "";
 	
 	Connection conn = null;
 	
 	/*
-	 * PreparedStatement ?„¸?Œ… ë©”ì„œ?“œ. sqlê³? ?•„?š”?•œ ?ŒŒ?¼ë¯¸í„°ë¥? ë°›ì•„ ?ŒŒ?¼ë¯¸í„° ë°”ì¸?”©?„ ???‹  ?•´ì¤?
+	 * PreparedStatement ì„¸íŒ… ë©”ì„œë“œ. sqlê³¼ í•„ìš”í•œ íŒŒë¼ë¯¸í„°ë¥¼ ë°›ì•„ íŒŒë¼ë¯¸í„° ë°”ì¸ë”©ì„ ëŒ€ì‹  í•´ì¤Œ
 	 * */
 	public PreparedStatement getPrepareStatement(String sql, Object[] params) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -30,8 +32,8 @@ public class DBUtil2 {
 		pstmt = conn.prepareStatement(sql);
 
 		for (int i = 0; i < params.length; i++) {
-			// instanceof?Š” ?–´?–¤ ?¸?Š¤?„´?Š¤?˜ ???…?„ ?•Œ?•„?‚¼ ?•Œ ?‚¬?š©. 
-			// A instanceof B -> Aê°? B???…?…?‹ˆê¹?? ê²°ê³¼?Š” true/false
+			// instanceofëŠ” ì–´ë–¤ ì¸ìŠ¤í„´ìŠ¤ì˜ íƒ€ì…ì„ ì•Œì•„ë‚¼ ë•Œ ì‚¬ìš©. 
+			// A instanceof B -> Aê°€ Bíƒ€ì…ì…ë‹ˆê¹Œ? ê²°ê³¼ëŠ” true/false
 			if (params[i] instanceof Integer) {
 				pstmt.setInt(i + 1, (int) params[i]);
 			} else {
@@ -42,25 +44,25 @@ public class DBUtil2 {
 		return pstmt;
 	}
 
-	/* <T>?Š” ? œ?„ˆë¦??´?¼ê³? ?•˜ë©? ì½”ë“œ?— ???…?„ ? •?•´?†“?œ¼ë©? ?‹¤ë¥? ???…?„ ?‚¬?š©?•  ?ˆ˜ ?—†?œ¼?‹ˆ ë³??ˆ˜ì²˜ëŸ¼
-	 ? ?–´?†“ê³? ???…?? ì»´íŒŒ?¼ ?•Œ ?‚¬?š©?•˜?Š” ìª½ì—?„œ ê²°ì •?•˜?Š” ê²?.
-	 ?•´?‹¹ ë©”ì„œ?“œ?˜ T?Š” ArticleDao?—?„œ ?˜¸ì¶? ?•  ?•Œ ? •?•´ì§„ë‹¤.
+	/* <T>ëŠ” ì œë„ˆë¦­ì´ë¼ê³  í•˜ë©° ì½”ë“œì— íƒ€ì…ì„ ì •í•´ë†“ìœ¼ë©´ ë‹¤ë¥¸ íƒ€ì…ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìœ¼ë‹ˆ ë³€ìˆ˜ì²˜ëŸ¼
+	 ì ì–´ë†“ê³  íƒ€ì…ì€ ì»´íŒŒì¼ ë•Œ ì‚¬ìš©í•˜ëŠ” ìª½ì—ì„œ ê²°ì •í•˜ëŠ” ê²ƒ.
+	 í•´ë‹¹ ë©”ì„œë“œì˜ TëŠ” ArticleDaoì—ì„œ í˜¸ì¶œ í•  ë•Œ ì •í•´ì§„ë‹¤.
 	
-	 * ì¡°íšŒê²°ê³¼ë¥? 1ê°? ê°?? ¸?˜¤?Š” ë©”ì„œ?“œ. pkë¥? ì¡°ê±´?œ¼ë¡? ì¡°íšŒë¥? ?•˜ë©? ë¬´ì¡°ê±? 0ê°? or 1ê°œê? ?‚˜?˜¤ë¯?ë¡?
-	 * ?•œê°œê? ?™•?‹¤?•  ê²½ìš° ?‚¬?š©?•˜?—¬ getRows?—?„œ ?•œë²? ?” ì¡°íšŒ?•˜?Š” ?¼?„ ì¤„ì¼ ?ˆ˜ ?ˆ?‹¤.
+	 * ì¡°íšŒê²°ê³¼ë¥¼ 1ê°œ ê°€ì ¸ì˜¤ëŠ” ë©”ì„œë“œ. pkë¥¼ ì¡°ê±´ìœ¼ë¡œ ì¡°íšŒë¥¼ í•˜ë©´ ë¬´ì¡°ê±´ 0ê°œ or 1ê°œê°€ ë‚˜ì˜¤ë¯€ë¡œ
+	 * í•œê°œê°€ í™•ì‹¤í•  ê²½ìš° ì‚¬ìš©í•˜ì—¬ getRowsì—ì„œ í•œë²ˆ ë” ì¡°íšŒí•˜ëŠ” ì¼ì„ ì¤„ì¼ ìˆ˜ ìˆë‹¤.
 	 * */
 	public <T> T getRow(String sql, RowMapper<T> mapper, Object... params) {
 		
 		T result = null;
-
-		if (getRows(sql, mapper, params).size() != 0) {
-			result = getRows(sql, mapper, params).get(0);
+		ArrayList<T> atricles = getRows(sql, mapper, params);
+		if (atricles.size() != 0) {
+			result = atricles.get(0);
 		}
 
 		return result;
 	}
 	
-	// resultSet?„ mapper?— ?„˜ê²? mapper?—?„œ ë°”ì¸?”©?œ ê°ì²´ë¥? ë¦¬í„´?•´ì£¼ëŠ” ë°©ì‹
+	// resultSetì„ mapperì— ë„˜ê²¨ mapperì—ì„œ ë°”ì¸ë”©ëœ ê°ì²´ë¥¼ ë¦¬í„´í•´ì£¼ëŠ” ë°©ì‹
 	public <T> ArrayList<T> getRows(String sql, RowMapper<T> mapper, Object... params) {
 		
 		if (params.length != 0 && params[0] instanceof Object[]) {
@@ -155,4 +157,6 @@ public class DBUtil2 {
 		}
 
 	}
+
+
 }

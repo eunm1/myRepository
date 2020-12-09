@@ -8,6 +8,7 @@ public class Article {
 	private String regDate;
 	private int hit;
 	private int mid;
+	private int like;
 	public Article() {
 
 	}
@@ -75,6 +76,14 @@ public class Article {
 
 	public void setMid(int mid) {
 		this.mid = mid;
+	}
+
+	public int getLike() {
+		return like;
+	}
+
+	public void setLike(int like) {
+		this.like = like;
 	}
 	
 }

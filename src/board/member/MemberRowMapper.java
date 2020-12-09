@@ -12,12 +12,14 @@ public class MemberRowMapper implements RowMapper<Member> {
 		String loginid = rs.getString("loginId");
 		String loginpass = rs.getString("loginpass");
 		String nickname = rs.getString("nickname");
+		String regDate = rs.getString("regDate");
 
 		Member member = new Member();
 		member.setId(id);
 		member.setLoginid(loginid);
 		member.setLoginpass(loginpass);
 		member.setNickname(nickname);
+		member.setRegDate(regDate);
 		
 		return member;
 	}
